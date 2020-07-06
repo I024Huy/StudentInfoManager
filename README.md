@@ -39,37 +39,37 @@
 
 ## 4. 系统框架图
 
-![img](file:///C:/Users/EDAT丶~1/AppData/Local/Temp/msohtmlclip1/01/clip_image002.jpg)
+![img](https://github.com/I024Huy/StudentInfoManager/blob/master/1.jpg)
 
 ## 5. 运行截图
 
 #### 5.1 登陆界面
 
-![image-20200706164735873](file:///C:\Users\EDAT丶ICiT\AppData\Roaming\Typora\typora-user-images\image-20200706164735873.png)
+![image-20200706164735873](https://github.com/I024Huy/StudentInfoManager/blob/master/image-20200706164735873.png)
 
 #### 5.2 管理员
 
 学生信息管理
 
-![image-20200706165042813](file:///C:\Users\EDAT丶ICiT\AppData\Roaming\Typora\typora-user-images\image-20200706165042813.png)
+![image-20200706165042813](https://github.com/I024Huy/StudentInfoManager/blob/master/image-20200706165042813.png)
 
 辅导员信息管理
 
-![image-20200706165056435](file:///C:\Users\EDAT丶ICiT\AppData\Roaming\Typora\typora-user-images\image-20200706165056435.png)
+![image-20200706165056435](https://github.com/I024Huy/StudentInfoManager/blob/master/image-20200706165056435.png)
 
 #### 5.3 辅导员
 
 主界面：
 
-![image-20200706164938233](file:///C:\Users\EDAT丶ICiT\AppData\Roaming\Typora\typora-user-images\image-20200706164938233.png)
+![image-20200706164938233](https://github.com/I024Huy/StudentInfoManager/blob/master/image-20200706164938233.png)
 
 学生获奖情况查询
 
-![image-20200706164953405](file:///C:\Users\EDAT丶ICiT\AppData\Roaming\Typora\typora-user-images\image-20200706164953405.png)
+![image-20200706164953405](https://github.com/I024Huy/StudentInfoManager/blob/master/image-20200706164953405.png)
 
 学生获奖情况添加
 
-![image-20200706165007315](file:///C:\Users\EDAT丶ICiT\AppData\Roaming\Typora\typora-user-images\image-20200706165007315.png)
+![image-20200706165007315](https://github.com/I024Huy/StudentInfoManager/blob/master/image-20200706165007315.png)
 
 缺旷情况类似
 
@@ -77,12 +77,12 @@
 
 主界面：
 
-![image-20200706164813531](file:///C:\Users\EDAT丶ICiT\AppData\Roaming\Typora\typora-user-images\image-20200706164813531.png)
+![image-20200706164813531](https://github.com/I024Huy/StudentInfoManager/blob/master/image-20200706164813531.png)
 
 个人信息
 
-![image-20200706164851154](file:///C:\Users\EDAT丶ICiT\AppData\Roaming\Typora\typora-user-images\image-20200706164851154.png)
+![image-20200706164851154](https://github.com/I024Huy/StudentInfoManager/blob/master/image-20200706164851154.png)
 
 获奖信息：
 
-![image-20200706164910093](file:///C:\Users\EDAT丶ICiT\AppData\Roaming\Typora\typora-user-images\image-20200706164910093.png)
+![image-20200706164910093](https://github.com/I024Huy/StudentInfoManager/blob/master/image-20200706164910093.png)
