@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hay.mapper.MyAdminMapper">
+    <resultMap id="StudentInfoMap" type="Student">
+        <id property="sid" column="sid"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="name" property="name"/>
+        <result column="gender" property="gender"/>
+        <result column="age" property="age"/>
+        <result column="phone" property="phone"/>
+        <result column="email" property="email"/>
+        <result column="room" property="room"/>
+        <result column="IDcard" property="IDcard"/>
+        <result column="grade" property="grade"/>
+        <result column="myclass" property="myclass"/>
+        <association property="family" javaType="Family">
+            <id column="fid" property="fid"/>
+            <result column="address" property="address"/>
+            <result column="fname" property="fname"/>
+            <result column="fgender" property="fgender"/>
+            <result column="fage" property="fage"/>
+            <result column="fphone" property="fphone"/>
+        </association>
+        <association property="profession" javaType="Profession">
+            <id column="zid" property="zid"/>
+            <result column="zname" property="name"/>
+        </association>
+        <association property="college" javaType="College">
+            <id column="xid" property="xid"/>
+            <result column="xname" property="name"/>
+        </association>
+        <association property="counselor" javaType="Counselor">
+            <id column="cid" property="cid"/>
+            <result column="cusername" property="username"/>
+            <result column="cname" property="name"/>
+            <result column="cphone" property="phone"/>
+        </association>
+
+    </resultMap>
+
+    <sql id="StudentInfoSql">
+        select
+            s.*,f.*,p.*,c.*,
+            c2.cid,c2.username cusername,c2.name cname,c2.phone cphone
+        from student s
+            join family f on s.fid = f.fid
+            join profession p on s.zid = p.zid
+            join college c on p.xid = c.xid
+            join counselor c2 on s.cid = c2.cid
+    </sql>
+
+
+    <select id="adminLogin" resultType="Admin">
+        select * from admin where username = #{username} and password = #{password}
+    </select>
+
+    <select id="queryStudentInfoList" resultMap="StudentInfoMap">
+        select
+            s.*,p.*,c.*
+        from student s
+            join profession p on s.zid = p.zid
+            join college c on p.xid = c.xid
+    </select>
+
+    <select id="queryStudentInfoListByKeyWorld" resultMap="StudentInfoMap">
+        <include refid="StudentInfoSql"/>
+        <where>
+            <if test="key == 'sid'">
+                s.username like '%${value}%'
+            </if>
+            <if test="key == 'name'">
+                s.name like '%${value}%'
+            </if>
+            <if test="key == 'xname'">
+                c.xname like '%${value}%'
+            </if>
+            <if test="key == 'zname'">
+                p.zname like '%${value}%'
+            </if>
+            <if test="key == 'myclass'">
+                myclass like '%${value}%'
+            </if>
+        </where>
+    </select>
+
+    <select id="getStudentInfoBySid" parameterType="string" resultMap="StudentInfoMap">
+        <include refid="StudentInfoSql"/>
+        where s.sid = #{sid}
+    </select>
+
+    <select id="getProfessionById" parameterType="string" resultType="map">
+        select
+            p.zname,c.xname
+        from profession p
+        join college c on p.xid = c.xid
+        where zid = #{zid}
+    </select>
+
+    <select id="getCounselorById" parameterType="string" resultType="map">
+        select cid,phone,name from counselor where username = #{username}
+    </select>
+
+    <update id="saveStudentInfo">
+        update student
+        <set>
+            username = #{student.username},
+            password = #{student.password},
+            name = #{student.name},
+            gender = #{student.gender},
+            age = #{student.age},
+            phone = #{student.phone},
+            email = #{student.email},
+            room = #{student.room},
+            IDcard = #{student.IDcard},
+            grade = #{student.grade},
+            myclass = #{student.myclass},
+            zid = #{student.profession.zid},
+            cid = #{cid}
+        </set>
+        where username = #{oldUsername}
+    </update>
+
+    <select id="getStudentFamilyId" parameterType="string" resultType="map">
+        select fid from student where sid = #{sid}
+    </select>
+
+    <update id="setNullPandCounselor" parameterType="string">
+        update student set fid = null, zid = null, cid = null where sid = #{sid}
+    </update>
+
+    <delete id="deleteStudentAbsent" parameterType="string">
+        delete from absent where sid = #{sid}
+    </delete>
+
+    <delete id="deleteStudentPrize" parameterType="string">
+        delete from prize where sid = #{sid}
+    </delete>
+
+    <delete id="deleteStudent" parameterType="string">
+        delete from student where sid = #{sid}
+    </delete>
+
+    <delete id="deleteStudentFamily" parameterType="string">
+        delete from family where fid = #{fid}
+    </delete>
+
+    <select id="getCounselorId" parameterType="string" resultType="string">
+        select cid from counselor where username = #{username}
+    </select>
+
+    <update id="modifyPassword">
+        update admin set password = #{password} where aid = #{aid}
+    </update>
+
+    <insert id="createStudentFamilyId" parameterType="family" useGeneratedKeys="true" keyProperty="fid">
+        insert into family values (#{fid},#{flag},#{address},#{fname},#{fgender},#{fage},#{fphone})
+    </insert>
+
+    <insert id="addStudentInfo">
+        insert into student values (#{student.sid},#{student.username},
+            #{student.password},#{student.name},#{student.gender},#{student.age},
+            #{student.phone},#{student.email},#{student.room},#{student.IDcard},
+            #{student.grade},#{student.myclass},#{fid},#{zid},
+            #{cid})
+    </insert>
+
+    <select id="getStudentByUsername" parameterType="string" resultType="int">
+        select count(sid) from student where username = #{username}
+    </select>
+
+    <select id="queryCounselorInfoList" resultType="counselor">
+        select * from counselor
+    </select>
+
+    <select id="keyQuery" resultType="counselor">
+        select * from counselor
+        <where>
+            <if test="key == 'username'">
+                username like '%${value}%'
+            </if>
+            <if test="key == 'name'">
+                name like '%${value}%'
+            </if>
+        </where>
+    </select>
+
+    <select id="getCounselorInfoByCid" parameterType="string" resultType="map">
+        select * from counselor where cid = #{cid}
+    </select>
+
+    <update id="saveCounselorInfo" parameterType="counselor">
+        update counselor set username = #{username},password = #{password},
+        name = #{name},gender = #{gender},age = #{age},phone = #{phone},email = #{email},
+        address = #{address} where cid = #{cid}
+    </update>
+
+    <update id="setStudentCidNull" parameterType="string">
+        update student set cid = null where cid = #{cid}
+    </update>
+
+    <delete id="deleteCounselorByCid" parameterType="string">
+        delete from counselor where cid = #{cid}
+    </delete>
+
+    <select id="getCounselorByUsername" parameterType="string" resultType="int">
+        select count(cid) from counselor where username = #{username}
+    </select>
+
+    <insert id="addCounselorInfo" parameterType="counselor">
+        insert into counselor values (#{cid},#{username},#{password},#{name},#{gender},#{age},#{phone},#{email},#{address})
+    </insert>
+
+    <select id="exportStudentExcel" resultType="map">
+        select
+            s.username '0',s.name '1',s.IDcard '2',s.gender '3',s.password '4',s.age '5',
+            s.myclass '6',s.grade '7',p.zname '8',c.xname '9',s.room '10',s.phone '11',s.email '12',
+            f.fname '13',f.address '14',f.fgender '15',f.fage '16',f.fphone '17',
+            c2.username '18',c2.name '19',c2.phone '20'
+        from student s
+            join family f on s.fid = f.fid
+            join profession p on s.zid = p.zid
+            join college c on p.xid = c.xid
+            join counselor c2 on s.cid = c2.cid
+    </select>
+
+    <select id="exportCounselorExcel" resultType="map">
+        select username '0',password '1',name '2',gender '3',age '4',phone '5',email '6',address '7'
+        from counselor
+    </select>
+</mapper>

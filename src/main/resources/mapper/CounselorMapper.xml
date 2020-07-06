@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hay.mapper.CounselorMapper">
+
+    <resultMap id="StudentInfoMap" type="Student">
+        <id property="sid" column="sid"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="name" property="name"/>
+        <result column="gender" property="gender"/>
+        <result column="age" property="age"/>
+        <result column="phone" property="phone"/>
+        <result column="email" property="email"/>
+        <result column="room" property="room"/>
+        <result column="IDcard" property="IDcard"/>
+        <result column="grade" property="grade"/>
+        <result column="myclass" property="myclass"/>
+        <association property="family" javaType="Family">
+            <id column="fid" property="fid"/>
+            <result column="address" property="address"/>
+            <result column="fname" property="fname"/>
+            <result column="fgender" property="fgender"/>
+            <result column="fage" property="fage"/>
+            <result column="fphone" property="fphone"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="PrizeListMap" type="Prize">
+        <id column="hid" property="hid"/>
+        <result column="name" property="name"/>
+        <result column="level" property="level"/>
+        <result column="date" property="date"/>
+        <association property="student" javaType="Student">
+            <id property="sid" column="sid"/>
+            <result column="username" property="username"/>
+            <result column="sname" property="name"/>
+            <result column="gender" property="gender"/>
+            <result column="room" property="room"/>
+            <result column="grade" property="grade"/>
+            <result column="myclass" property="myclass"/>
+            <association property="profession" javaType="Profession">
+                <id column="zid" property="zid"/>
+                <result column="zname" property="name"/>
+            </association>
+            <association property="college" javaType="College">
+                <id column="xid" property="xid"/>
+                <result column="xname" property="name"/>
+            </association>
+        </association>
+    </resultMap>
+
+    <resultMap id="AbsentInfoMap" type="Absent">
+        <id property="kid" column="kid"/>
+        <result property="course" column="course"/>
+        <result property="date" column="date"/>
+        <result property="content" column="content"/>
+        <association property="student" javaType="Student">
+            <id property="sid" column="sid"/>
+            <result column="username" property="username"/>
+            <result column="sname" property="name"/>
+            <result column="gender" property="gender"/>
+            <result column="room" property="room"/>
+            <result column="grade" property="grade"/>
+            <result column="myclass" property="myclass"/>
+            <association property="profession" javaType="Profession">
+                <id column="zid" property="zid"/>
+                <result column="zname" property="name"/>
+            </association>
+            <association property="college" javaType="College">
+                <id column="xid" property="xid"/>
+                <result column="xname" property="name"/>
+            </association>
+        </association>
+    </resultMap>
+
+    <sql id="PrizeInfoSql">
+        select  p.*,
+                s.sid,s.username,s.name sname,s.gender,s.room,s.grade,s.myclass,
+                p2.*,
+                c.*
+        from prize p
+				join student s on p.sid = s.sid
+                join profession p2 on s.zid = p2.zid
+                join college c on p2.xid = c.xid
+                join counselor c2 on s.cid = c2.cid
+    </sql>
+
+    <sql id="AbsentInfoSql">
+        select
+            a.*,
+            s.sid,s.username,s.name sname,s.gender,s.room,s.grade,s.myclass,s.cid,
+            p.*,
+            c.*
+        from absent a
+            join student s on a.sid = s.sid
+            join profession p on s.zid = p.zid
+            join college c on p.xid = c.xid
+    </sql>
+
+
+
+    <select id="login" resultType="counselor">
+        select * from counselor where username = #{username} and password = #{password}
+    </select>
+
+    <select id="counselorInfo" parameterType="int" resultType="counselor">
+        select * from counselor where cid = #{cid}
+    </select>
+
+    <select id="studentInfo" parameterType="int" resultMap="StudentInfoMap">
+        select
+            s.*,f.fname,f.address,f.fphone
+        from student s
+        join family f on s.fid = f.fid
+        where cid = #{cid}
+    </select>
+    
+    <select id="keyQueryStudent" resultMap="StudentInfoMap">
+        select
+            s.*,f.fname,f.address,f.fphone
+        from student s
+        join family f on s.fid = f.fid
+        where 
+        <if test="key == 'username'">
+            s.username like '%${value}%' and
+        </if>
+        <if test="key == 'name'">
+            s.name like '%${value}%' and
+        </if>
+        <if test="key == 'myclass'">
+            s.myclass like '%${value}%' and
+        </if>
+        <if test="key == 'grade'">
+            s.grade like '%${value}%' and
+        </if>
+        cid = #{cid}
+    </select>
+
+    <update id="modifyPassword">
+        update counselor set password = #{tpassword} where cid = #{cid}
+    </update>
+
+    <select id="studentPrizeInfo" parameterType="int" resultMap="PrizeListMap">
+        <include refid="PrizeInfoSql"/>
+        where c2.cid = #{cid} order by s.sid
+    </select>
+
+    <select id="getPrizeInfoByKey" resultMap="PrizeListMap">
+        <include refid="PrizeInfoSql"/>
+        where c2.cid = #{cid} and
+        <if test="type == 'sid'">
+            s.username like '%${value}%'
+        </if>
+        <if test="type == 'name'">
+            p.name like '%${value}%'
+        </if>
+        order by s.sid
+    </select>
+
+    <select id="findStudentByUsername" parameterType="string" resultType="string">
+        select sid from student where username = #{username}
+    </select>
+
+    <insert id="addStudentPrizeInfo" useGeneratedKeys="true" keyProperty="prize.hid">
+        insert into prize values (#{prize.hid},#{prize.name},#{prize.level},#{prize.date},#{sid})
+    </insert>
+
+    <select id="getStudentByUsername" resultType="map">
+        select name from student
+        where username = #{username}
+        and cid = #{cid}
+    </select>
+
+    <select id="getAbsentInfo" parameterType="int" resultMap="AbsentInfoMap">
+        <include refid="AbsentInfoSql"/>
+        where s.cid = #{cid} order by s.sid
+    </select>
+
+    <select id="getAbsentInfoByKey" resultMap="AbsentInfoMap">
+        <include refid="AbsentInfoSql"/>
+        where s.cid = #{cid} and
+        <if test="type == 'sid'">
+            s.username like '%${value}%'
+        </if>
+        <if test="type == 'course'">
+            a.course like '%${value}%'
+        </if>
+        order by s.sid
+    </select>
+
+    <insert id="addStudentAbsentInfo" useGeneratedKeys="true" keyProperty="absent.kid">
+        insert into absent values (#{absent.kid},#{absent.course},#{absent.date},#{absent.content},#{sid})
+    </insert>
+
+    <select id="exportStudentPrizeExcel" parameterType="int" resultType="map">
+        select
+            s.username '0',s.name '1',s.gender '2',p.name '3',p.level '4',p.date '5',
+            s.myclass '6',s.grade '7',p2.zname '8',c.xname '9',s.room '10'
+        from student s
+        join prize p on p.sid = s.sid
+        join profession p2 on p2.zid = s.zid
+        join college c on p2.xid = c.xid
+        join counselor c2 on c2.cid = s.cid
+        where c2.cid = #{cid}
+    </select>
+
+    <select id="exportStudentAbsentExcel" parameterType="int" resultType="map">
+        select
+            s.username '0',s.name '1',s.gender '2',a.course '3',a.date '4',a.content '5',
+            s.myclass '6',s.grade '7',p.zname '8',c.xname '9',s.room '10'
+        from student s
+        join absent a on a.sid = s.sid
+        join profession p on p.zid = s.zid
+        join college c on p.xid = c.xid
+        join counselor c2 on c2.cid = s.cid
+        where c2.cid = #{cid}
+    </select>
+
+    <delete id="deleteStudentPrize" parameterType="string">
+        delete from prize where hid = #{hid}
+    </delete>
+
+    <delete id="deleteStudentAbsent" parameterType="string">
+        delete from absent where kid = #{kid}
+    </delete>
+</mapper>

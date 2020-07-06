@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hay.mapper.StudentMapper">
+
+    <!-- 构建学生实体，将里面对象属性中的值一一映射  -->
+    <resultMap id="StudentInfoMap" type="Student">
+        <id property="sid" column="sid"/>
+        <result column="authority" property="authority"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="name" property="name"/>
+        <result column="gender" property="gender"/>
+        <result column="age" property="age"/>
+        <result column="phone" property="phone"/>
+        <result column="email" property="email"/>
+        <result column="room" property="room"/>
+        <result column="IDcard" property="IDcard"/>
+        <result column="grade" property="grade"/>
+        <result column="myclass" property="myclass"/>
+        <association property="profession" javaType="Profession">
+            <id column="zid" property="zid"/>
+            <result column="zname" property="name"/>
+        </association>
+        <association property="college" javaType="College">
+            <id column="xid" property="xid"/>
+            <result column="xname" property="name"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="PrizeMap" type="Prize">
+        <id property="hid" column="hid"/>
+        <result property="name" column="name"/>
+        <result property="level" column="level"/>
+        <result property="date" column="date"/>
+        <association property="student" javaType="Student">
+            <id property="sid" column="sid"/>
+        </association>
+    </resultMap>
+
+    <select id="getStudentByUsernameAndPassword" resultType="Student">
+        select * from student where username = #{username} and password = #{password}
+    </select>
+
+    <select id="getStudentInfoBySid" parameterType="string" resultMap="StudentInfoMap">
+        select * from student s
+        join profession p on s.zid=p.zid
+        join college c on p.xid = c.xid
+        where sid = #{sid}
+    </select>
+
+    <select id="getFamilyInfoBySid" parameterType="string" resultType="family">
+        select f.* from student s join family f on s.fid=f.fid where s.sid = #{sid}
+    </select>
+
+    <update id="modifyPassword">
+        update student
+        <set>
+            password = #{spassword}
+        </set>
+        where sid = #{sid}
+    </update>
+
+    <update id="addFamily" parameterType="family">
+        update family set flag = #{flag},address = #{address},fname = #{fname},
+            fgender = #{fgender},fage = #{fage},fphone = #{fphone}
+        where fid = #{fid}
+    </update>
+
+    <update id="addStudentFid">
+        update student set fid = #{fid} where sid = #{sid}
+    </update>
+
+    <select id="getPrize" parameterType="string" resultMap="PrizeMap">
+        select * from prize where sid = #{sid}
+    </select>
+</mapper>
